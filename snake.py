@@ -9,6 +9,7 @@ from pygame.locals import *
 import random
 import numpy
 
+clock = pygame.time.Clock()
 
 # Colors
 WHITE = (255, 255, 255)
@@ -53,7 +54,14 @@ def drawField():
             elif field[i][j] == 3:
                 SURFACE.blit(head, (j * 32, i * 32))
                 
+def moveSnake():
+    pass
 
+
+SPEEDSNAKE = 3
+SPEED = 60
+
+gameCounter = 0
 isRunning = True
 while isRunning:
     SURFACE.fill(WHITE)
@@ -64,7 +72,16 @@ while isRunning:
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 isRunning = False
+    
+    if gameCounter % (SPEED / SPEEDSNAKE) == 0:
+        moveSnake()
+    
     drawField()
+    
+    clock.tick(SPEED)
+    
     pygame.display.update()
-
+    
+    gameCounter = gameCounter + 1
+    print(gameCounter)
 pygame.quit()
