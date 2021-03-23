@@ -25,11 +25,8 @@ FIELDWIDTH = 10
 FIELDHEIGHT = 10
 
 field = numpy.zeros((FIELDHEIGHT, FIELDWIDTH), dtype=numpy.int16)
-field[3][4] = 3
-field[4][4] = 2
-field[5][4] = 2
-field[6][4] = 2
-field[7][4] = 1
+
+anaconda = [[7,4], [6,4], [5,4], [4,4], [3,4]]
 
 
 SURFACE = pygame.display.set_mode((32 * FIELDWIDTH, 32 * FIELDHEIGHT))
@@ -44,7 +41,15 @@ body = snake.subsurface(2 * 64, 64, 64, 64)
 body = pygame.transform.scale(body, (32, 32))
 tail = snake.subsurface(3 * 64, 2 * 64, 64, 64)
 tail = pygame.transform.scale(tail, (32, 32))
+
 def drawField():
+    field[:,:] = 0
+    
+    for segment in anaconda:
+        field[segment[0]][segment[1]] = 2
+    field[anaconda[0][0]][anaconda[0][1]] = 1
+    field[anaconda[-1][0]][anaconda[-1][1]] = 3
+    
     for i in range(field.shape[0]):
         for j in range(field.shape[1]):
             if field[i][j] == 1:
@@ -83,5 +88,5 @@ while isRunning:
     pygame.display.update()
     
     gameCounter = gameCounter + 1
-    print(gameCounter)
+    
 pygame.quit()
