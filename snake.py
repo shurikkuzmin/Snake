@@ -21,8 +21,8 @@ BLACK = (0, 0, 0)
 pygame.init()
 
 
-FIELDWIDTH = 10
-FIELDHEIGHT = 10
+FIELDWIDTH = 20
+FIELDHEIGHT = 20
 
 field = numpy.zeros((FIELDHEIGHT, FIELDWIDTH), dtype=numpy.int16)
 
@@ -59,8 +59,32 @@ def drawField():
             elif field[i][j] == 3:
                 SURFACE.blit(head, (j * 32, i * 32))
                 
-def moveSnake():
-    pass
+def moveSnake(direction):
+    headSegment = anaconda[-1]
+    
+    if direction == "Up":
+        newRow = headSegment[0] - 1
+        newColumn = headSegment[1]
+    if direction == "Down":
+        newRow = headSegment[0] + 1
+        newColumn = headSegment[1]
+    if direction == "Left":
+        newRow = headSegment[0]
+        newColumn = headSegment[1] - 1
+    if direction == "Right":
+        newRow = headSegment[0]
+        newColumn = headSegment[1] + 1
+    
+    if newRow == -1:
+        newRow = FIELDHEIGHT-1
+    if newRow == FIELDHEIGHT:
+        newRow = 0
+    if newColumn == -1:
+        newColumn = FIELDWIDTH - 1
+    if newColumn == FIELDWIDTH:
+        newColumn = 0
+    anaconda.append([newRow, newColumn])
+    anaconda.pop(0)
 
 
 SPEEDSNAKE = 3
@@ -68,6 +92,8 @@ SPEED = 60
 
 gameCounter = 0
 isRunning = True
+direction = "Up"
+oldDirection = "Up"
 while isRunning:
     SURFACE.fill(WHITE)
     
@@ -77,9 +103,18 @@ while isRunning:
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 isRunning = False
+            if event.key == K_UP and oldDirection != "Down":
+                direction = "Up"
+            if event.key == K_DOWN and oldDirection != "Up":
+                direction = "Down"
+            if event.key == K_LEFT and oldDirection != "Right":
+                direction = "Left"
+            if event.key == K_RIGHT and oldDirection != "Left":
+                direction = "Right"
     
     if gameCounter % (SPEED / SPEEDSNAKE) == 0:
-        moveSnake()
+        oldDirection = direction
+        moveSnake(direction)
     
     drawField()
     
