@@ -35,29 +35,62 @@ SURFACE = pygame.display.set_mode((32 * FIELDWIDTH, 32 * FIELDHEIGHT))
 
 snake = pygame.image.load("snake.png")
 
-head = snake.subsurface(3 * 64, 0, 64, 64)
-head = pygame.transform.scale(head, (32, 32))
-body = snake.subsurface(2 * 64, 64, 64, 64)
-body = pygame.transform.scale(body, (32, 32))
-tail = snake.subsurface(3 * 64, 2 * 64, 64, 64)
-tail = pygame.transform.scale(tail, (32, 32))
+headNorth = snake.subsurface(3 * 64, 0, 64, 64) #1
+headNorth = pygame.transform.scale(headNorth, (32, 32))
+headSouth = snake.subsurface(4 * 64, 64, 64, 64) #2
+headSouth = pygame.transform.scale(headSouth, (32, 32))
+headWest = snake.subsurface(3 * 64, 64, 64, 64) #3
+headWest = pygame.transform.scale(headWest, (32, 32))
+headEast = snake.subsurface(4 * 64, 0, 64, 64) #4
+headEast = pygame.transform.scale(headEast, (32, 32))
+
+bodyVertical = snake.subsurface(2 * 64, 64, 64, 64) #5
+bodyVertical = pygame.transform.scale(bodyVertical, (32, 32))
+bodyHorizontal = snake.subsurface(64, 0, 64, 64) #6
+bodyHorizontal = pygame.transform.scale(bodyHorizontal, (32, 32))
+
+tailNorth = snake.subsurface(3 * 64, 2 * 64, 64, 64) #7
+tailNorth = pygame.transform.scale(tailNorth, (32, 32))
+tailSouth = snake.subsurface(4 * 64, 3 * 64, 64, 64) #8
+tailSouth = pygame.transform.scale(tailSouth, (32, 32))
+tailWest = snake.subsurface(3 * 64, 3 * 64, 64, 64) #9
+tailWest = pygame.transform.scale(tailWest, (32, 32))
+tailEast = snake.subsurface(4 * 64, 2 * 64, 64, 64) #10
+tailEast = pygame.transform.scale(tailEast, (32, 32))
+
+joint1 = snake.subsurface(0, 0, 64, 64) #11
+joint1 = pygame.transform.scale(joint1, (32, 32))
+joint2 = snake.subsurface(0, 64, 64, 64) #12
+joint2 = pygame.transform.scale(joint2, (32, 32))
+joint3 = snake.subsurface(2 * 64, 0, 64, 64) #13
+joint3 = pygame.transform.scale(joint3, (32, 32))
+joint4 = snake.subsurface(2 * 64, 2 * 64, 64, 64) #14
+joint4 = pygame.transform.scale(joint4, (32, 32))
 
 def drawField():
     field[:,:] = 0
     
     for segment in anaconda:
-        field[segment[0]][segment[1]] = 2
-    field[anaconda[0][0]][anaconda[0][1]] = 1
-    field[anaconda[-1][0]][anaconda[-1][1]] = 3
+        field[segment[0]][segment[1]] = 5
+    field[anaconda[0][0]][anaconda[0][1]] = 7
+    field[anaconda[-1][0]][anaconda[-1][1]] = 1
     
     for i in range(field.shape[0]):
         for j in range(field.shape[1]):
             if field[i][j] == 1:
-                SURFACE.blit(tail, (j * 32, i * 32))
+                SURFACE.blit(headNorth, (j * 32, i * 32))
             elif field[i][j] == 2:
-                SURFACE.blit(body, (j * 32, i * 32))
+                SURFACE.blit(headSouth, (j * 32, i * 32))
             elif field[i][j] == 3:
-                SURFACE.blit(head, (j * 32, i * 32))
+                SURFACE.blit(headWest, (j * 32, i * 32))
+            elif field[i][j] == 4:
+                SURFACE.blit(headEast, (j * 32, i * 32))
+            elif field[i][j] == 5:
+                SURFACE.blit(bodyVertical, (j * 32, i * 32))
+            elif field[i][j] == 6:
+                SURFACE.blit(bodyHorizontal, (j * 32, i* 32))
+            elif field[i][j] == 7:
+                SURFACE.blit(tailNorth, (j * 32, i * 32))
                 
 def moveSnake(direction):
     headSegment = anaconda[-1]
