@@ -71,9 +71,23 @@ def drawField():
     field[:,:] = 0
     
     for segment in anaconda:
-        field[segment[0]][segment[1]] = 5
-    field[anaconda[0][0]][anaconda[0][1]] = 7
-    field[anaconda[-1][0]][anaconda[-1][1]] = 1
+        field[segment[0]][segment[1]] = 7
+    
+    tailCoors = anaconda[0]
+    nextTailCoors = anaconda[1]
+    
+    if tailCoors[0] == nextTailCoors[0]:
+        if nextTailCoors[1] > tailCoors[1]:
+            field[tailCoors[0]][tailCoors[1]] = 10
+        else:
+            field[tailCoors[0]][tailCoors[1]] = 9
+    else:
+        if nextTailCoors[0] > tailCoors[0]:
+            field[tailCoors[0]][tailCoors[1]] = 8
+        else:
+            field[tailCoors[0]][tailCoors[1]] = 7
+    
+    field[anaconda[-1][0]][anaconda[-1][1]] = 12
     
     for i in range(field.shape[0]):
         for j in range(field.shape[1]):
@@ -91,7 +105,20 @@ def drawField():
                 SURFACE.blit(bodyHorizontal, (j * 32, i* 32))
             elif field[i][j] == 7:
                 SURFACE.blit(tailNorth, (j * 32, i * 32))
-                
+            elif field[i][j] == 8:
+                SURFACE.blit(tailSouth, (j * 32, i * 32))
+            elif field[i][j] == 9:
+                SURFACE.blit(tailWest, (j * 32, i * 32))
+            elif field[i][j] == 10:
+                SURFACE.blit(tailEast, (j * 32, i * 32))
+            elif field[i][j] == 11:
+                SURFACE.blit(joint1, (j * 32, i * 32))
+            elif field[i][j] == 12:
+                SURFACE.blit(joint2, (j * 32, i * 32))
+            elif field[i][j] == 13:
+                SURFACE.blit(joint3, (j * 32, i * 32))
+            elif field[i][j] == 14:
+                SURFACE.blit(joint4, (j * 32, i * 32))
 def moveSnake(direction):
     headSegment = anaconda[-1]
     
