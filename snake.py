@@ -67,7 +67,7 @@ joint3 = pygame.transform.scale(joint3, (32, 32))
 joint4 = snake.subsurface(2 * 64, 2 * 64, 64, 64) #14
 joint4 = pygame.transform.scale(joint4, (32, 32))
 
-def drawField():
+def drawField(oldDirection):
     field[:,:] = 0
     
     for segment in anaconda:
@@ -77,17 +77,26 @@ def drawField():
     nextTailCoors = anaconda[1]
     
     if tailCoors[0] == nextTailCoors[0]:
-        if nextTailCoors[1] > tailCoors[1]:
+        if (nextTailCoors[1] == tailCoors[1] + 1) or ((tailCoors[1] == FIELDWIDTH - 1) and (nextTailCoors[1] == 0)):
             field[tailCoors[0]][tailCoors[1]] = 10
-        else:
+        if (nextTailCoors[1] == tailCoors[1] - 1) or (tailCoors[1] == 0 and (nextTailCoors[1] == FIELDWIDTH - 1)):
             field[tailCoors[0]][tailCoors[1]] = 9
     else:
-        if nextTailCoors[0] > tailCoors[0]:
+        if (nextTailCoors[0] == tailCoors[0] + 1) or ((tailCoors[0] == FIELDHEIGHT - 1) and (nextTailCoors[0] == 0)):
             field[tailCoors[0]][tailCoors[1]] = 8
-        else:
+        if (nextTailCoors[0] == tailCoors[0] - 1) or (tailCoors[0] == 0 and (nextTailCoors[0] == FIELDHEIGHT - 1)):
             field[tailCoors[0]][tailCoors[1]] = 7
+            
+    headCoors = anaconda[-1]
+    if oldDirection == "Up":
+        field[headCoors[0]][headCoors[1]] = 1
+    if oldDirection == "Down":
+        field[headCoors[0]][headCoors[1]] = 2
+    if oldDirection == "Left":
+        field[headCoors[0]][headCoors[1]] = 3
+    if oldDirection == "Right":
+        field[headCoors[0]][headCoors[1]] = 4
     
-    field[anaconda[-1][0]][anaconda[-1][1]] = 12
     
     for i in range(field.shape[0]):
         for j in range(field.shape[1]):
@@ -154,6 +163,8 @@ gameCounter = 0
 isRunning = True
 direction = "Up"
 oldDirection = "Up"
+
+gameStarted = False
 while isRunning:
     SURFACE.fill(WHITE)
     
@@ -171,12 +182,14 @@ while isRunning:
                 direction = "Left"
             if event.key == K_RIGHT and oldDirection != "Left":
                 direction = "Right"
+            if event.key == K_RETURN:
+                gameStarted = True
     
-    if gameCounter % (SPEED / SPEEDSNAKE) == 0:
+    if gameStarted and gameCounter % (SPEED / SPEEDSNAKE) == 0:
         oldDirection = direction
         moveSnake(direction)
     
-    drawField()
+    drawField(oldDirection)
     
     clock.tick(SPEED)
     
