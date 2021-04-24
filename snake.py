@@ -97,6 +97,25 @@ def drawField(oldDirection):
     if oldDirection == "Right":
         field[headCoors[0]][headCoors[1]] = 4
     
+    for i in range(1, len(anaconda)-1):
+        prevCoors = anaconda[i-1]
+        nextCoors = anaconda[i+1]
+        coors = anaconda[i]
+        if coors[0] == prevCoors[0] and coors[0] == nextCoors[0]:
+            field[coors[0]][coors[1]] = 6
+        if coors[1] == prevCoors[1] and coors[1] == nextCoors[1]:
+            field[coors[0]][coors[1]] = 5
+        if nextCoors[0] < prevCoors[0] and coors[0] == prevCoors[0]:
+            if nextCoors[1] > prevCoors[1]:
+                field[coors[0]][coors[1]] = 14
+            else:
+                field[coors[0]][coors[1]] = 12
+        if nextCoors[0] > prevCoors[0] and coors[0] == prevCoors[0]:
+            if nextCoors[1] < prevCoors[1]:
+                field[coors[0]][coors[1]] = 11
+            else:
+                field[coors[0]][coors[1]] = 13
+            
     
     for i in range(field.shape[0]):
         for j in range(field.shape[1]):
@@ -156,7 +175,7 @@ def moveSnake(direction):
     anaconda.pop(0)
 
 
-SPEEDSNAKE = 3
+SPEEDSNAKE = 4
 SPEED = 60
 
 gameCounter = 0
