@@ -27,7 +27,7 @@ FIELDHEIGHT = 20
 field = numpy.zeros((FIELDHEIGHT, FIELDWIDTH), dtype=numpy.int16)
 
 anaconda = [[7,4], [6,4], [5,4], [4,4], [3,4]]
-
+mcintosh = [random.randint(0,FIELDHEIGHT - 1), random.randint(0,FIELDWIDTH - 1)]
 
 SURFACE = pygame.display.set_mode((32 * FIELDWIDTH, 32 * FIELDHEIGHT))
 
@@ -67,8 +67,13 @@ joint3 = pygame.transform.scale(joint3, (32, 32))
 joint4 = snake.subsurface(2 * 64, 2 * 64, 64, 64) #14
 joint4 = pygame.transform.scale(joint4, (32, 32))
 
+apple = snake.subsurface(0, 3 * 64, 64, 64) #15
+apple = pygame.transform.scale(apple, (32, 32))
+
 def drawField(oldDirection):
     field[:,:] = 0
+    
+    field[mcintosh[0]][mcintosh[1]] = 15
     
     for segment in anaconda:
         field[segment[0]][segment[1]] = 7
@@ -105,16 +110,28 @@ def drawField(oldDirection):
             field[coors[0]][coors[1]] = 6
         if coors[1] == prevCoors[1] and coors[1] == nextCoors[1]:
             field[coors[0]][coors[1]] = 5
-        if nextCoors[0] < prevCoors[0] and coors[0] == prevCoors[0]:
-            if nextCoors[1] > prevCoors[1]:
-                field[coors[0]][coors[1]] = 14
-            else:
-                field[coors[0]][coors[1]] = 12
-        if nextCoors[0] > prevCoors[0] and coors[0] == prevCoors[0]:
-            if nextCoors[1] < prevCoors[1]:
-                field[coors[0]][coors[1]] = 11
-            else:
-                field[coors[0]][coors[1]] = 13
+        if nextCoors[0] < prevCoors[0]:
+            if coors[0] == prevCoors[0]:
+                if nextCoors[1] > prevCoors[1]:
+                    field[coors[0]][coors[1]] = 14
+                else:
+                    field[coors[0]][coors[1]] = 12
+            if coors[0] == nextCoors[0]:
+                if nextCoors[1] > prevCoors[1]:
+                    field[coors[0]][coors[1]] = 11
+                else:
+                    field[coors[0]][coors[1]] = 13
+        if nextCoors[0] > prevCoors[0]: 
+            if coors[0] == prevCoors[0]:
+                if nextCoors[1] < prevCoors[1]:
+                    field[coors[0]][coors[1]] = 11
+                else:
+                    field[coors[0]][coors[1]] = 13
+            if coors[0] == nextCoors[0]:
+                if nextCoors[1] < prevCoors[1]:
+                    field[coors[0]][coors[1]] = 14
+                else:
+                    field[coors[0]][coors[1]] = 12
             
     
     for i in range(field.shape[0]):
@@ -147,6 +164,8 @@ def drawField(oldDirection):
                 SURFACE.blit(joint3, (j * 32, i * 32))
             elif field[i][j] == 14:
                 SURFACE.blit(joint4, (j * 32, i * 32))
+            elif field[i][j] == 15:
+                SURFACE.blit(apple, (j * 32, i * 32))
 def moveSnake(direction):
     headSegment = anaconda[-1]
     
