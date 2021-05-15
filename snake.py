@@ -21,17 +21,39 @@ BLACK = (0, 0, 0)
 pygame.init()
 
 
-FIELDWIDTH = 20
-FIELDHEIGHT = 20
+FIELDWIDTH = 10
+FIELDHEIGHT = 10
+
 
 field = numpy.zeros((FIELDHEIGHT, FIELDWIDTH), dtype=numpy.int16)
 
 anaconda = [[7,4], [6,4], [5,4], [4,4], [3,4]]
-mcintosh = [random.randint(0,FIELDHEIGHT - 1), random.randint(0,FIELDWIDTH - 1)]
+
+def generateApple(mcintosh): 
+    notGenerated = True  
+    while notGenerated:
+        newRow = random.randint(0,FIELDHEIGHT - 1)
+        newColumn = random.randint(0,FIELDWIDTH - 1)
+        
+        notGenerated = False
+        for segment in anaconda:
+            if segment[0] == newRow and segment[1] == newColumn:
+                notGenerated = True
+                break
+    
+    mcintosh[0] = newRow 
+    mcintosh[1] = newColumn
+
+mcintosh = [0,0]
+generateApple(mcintosh)
 
 SURFACE = pygame.display.set_mode((32 * FIELDWIDTH, 32 * FIELDHEIGHT))
 
-
+font = pygame.font.SysFont("Comic Sans MS", 50)
+gameOverText = font.render("Game Over", False, BLUE)
+gameOverRect = gameOverText.get_rect()
+gameOverRect.centerx = 16 * FIELDWIDTH
+gameOverRect.centery = 16 * FIELDHEIGHT
 
 snake = pygame.image.load("snake.png")
 
@@ -190,9 +212,18 @@ def moveSnake(direction):
         newColumn = FIELDWIDTH - 1
     if newColumn == FIELDWIDTH:
         newColumn = 0
+        
+    for segment in anaconda:
+        if segment[0] == newRow and segment[1] == newColumn:
+            return False
     anaconda.append([newRow, newColumn])
-    anaconda.pop(0)
-
+    
+    if newRow == mcintosh[0] and newColumn == mcintosh[1]:
+        generateApple(mcintosh)
+    else:
+        anaconda.pop(0)
+    
+    return True
 
 SPEEDSNAKE = 4
 SPEED = 60
@@ -202,9 +233,11 @@ isRunning = True
 direction = "Up"
 oldDirection = "Up"
 
-gameStarted = False
+gameState = "Idle"
+#gameStarted = False
 while isRunning:
-    SURFACE.fill(WHITE)
+    if gameState != "GameOver":
+        SURFACE.fill(WHITE)
     
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -212,20 +245,26 @@ while isRunning:
         if event.type == KEYDOWN:
             if event.key == K_ESCAPE:
                 isRunning = False
-            if event.key == K_UP and oldDirection != "Down":
-                direction = "Up"
-            if event.key == K_DOWN and oldDirection != "Up":
-                direction = "Down"
-            if event.key == K_LEFT and oldDirection != "Right":
-                direction = "Left"
-            if event.key == K_RIGHT and oldDirection != "Left":
-                direction = "Right"
             if event.key == K_RETURN:
-                gameStarted = True
+                gameState = "Started"
+
+            if gameState != "GameOver":
+                if event.key == K_UP and oldDirection != "Down":
+                    direction = "Up"
+                if event.key == K_DOWN and oldDirection != "Up":
+                    direction = "Down"
+                if event.key == K_LEFT and oldDirection != "Right":
+                    direction = "Left"
+                if event.key == K_RIGHT and oldDirection != "Left":
+                    direction = "Right"
     
-    if gameStarted and gameCounter % (SPEED / SPEEDSNAKE) == 0:
+    if gameState == "Started" and gameCounter % (SPEED / SPEEDSNAKE) == 0:
         oldDirection = direction
-        moveSnake(direction)
+        if not moveSnake(direction):
+            SURFACE.blit(gameOverText, gameOverRect)
+            gameState = "GameOver"
+
+            #isRunning = False
     
     drawField(oldDirection)
     
@@ -233,6 +272,7 @@ while isRunning:
     
     pygame.display.update()
     
-    gameCounter = gameCounter + 1
+    if gameState == "Started":
+        gameCounter = gameCounter + 1
     
 pygame.quit()
