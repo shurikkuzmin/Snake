@@ -46,10 +46,13 @@ def generateApple(mcintosh):
 
 mcintosh = [0,0]
 generateApple(mcintosh)
+counterApple = 0
 
 SURFACE = pygame.display.set_mode((32 * FIELDWIDTH, 32 * FIELDHEIGHT))
 
-font = pygame.font.SysFont("Comic Sans MS", 50)
+font = pygame.font.SysFont("Comic Sans MS", 50, bold=5)
+fontCounter = pygame.font.SysFont("Comic Sans MS", 25, bold=2)
+
 gameOverText = font.render("Game Over", False, BLUE)
 gameOverRect = gameOverText.get_rect()
 gameOverRect.centerx = 16 * FIELDWIDTH
@@ -92,13 +95,18 @@ joint4 = pygame.transform.scale(joint4, (32, 32))
 apple = snake.subsurface(0, 3 * 64, 64, 64) #15
 apple = pygame.transform.scale(apple, (32, 32))
 
+sprites = []
+for i in range(0, 4):
+    for j in range(0, 5):
+        tempSprite = snake.subsurface(j * 64, i * 64, 64, 64) 
+        tempSprite = pygame.transform.scale(tempSprite, (32, 32))
+        sprites.append(tempSprite)
+
 def drawField(oldDirection):
     field[:,:] = 0
     
     field[mcintosh[0]][mcintosh[1]] = 15
     
-    for segment in anaconda:
-        field[segment[0]][segment[1]] = 7
     
     tailCoors = anaconda[0]
     nextTailCoors = anaconda[1]
@@ -158,6 +166,7 @@ def drawField(oldDirection):
     
     for i in range(field.shape[0]):
         for j in range(field.shape[1]):
+            #SURFACE.blit(sprites[field[i][j]], j*32, i*32)
             if field[i][j] == 1:
                 SURFACE.blit(headNorth, (j * 32, i * 32))
             elif field[i][j] == 2:
@@ -188,7 +197,15 @@ def drawField(oldDirection):
                 SURFACE.blit(joint4, (j * 32, i * 32))
             elif field[i][j] == 15:
                 SURFACE.blit(apple, (j * 32, i * 32))
+                
+    counterText = fontCounter.render(str(counterApple), False, RED)
+    counterRect = counterText.get_rect()
+    counterRect.top = 0
+    counterRect.right = 32 * FIELDWIDTH
+    SURFACE.blit(counterText, counterRect)
+    
 def moveSnake(direction):
+    global counterApple
     headSegment = anaconda[-1]
     
     if direction == "Up":
@@ -219,6 +236,7 @@ def moveSnake(direction):
     anaconda.append([newRow, newColumn])
     
     if newRow == mcintosh[0] and newColumn == mcintosh[1]:
+        counterApple = counterApple + 1
         generateApple(mcintosh)
     else:
         anaconda.pop(0)
@@ -261,12 +279,14 @@ while isRunning:
     if gameState == "Started" and gameCounter % (SPEED / SPEEDSNAKE) == 0:
         oldDirection = direction
         if not moveSnake(direction):
-            SURFACE.blit(gameOverText, gameOverRect)
             gameState = "GameOver"
 
             #isRunning = False
     
     drawField(oldDirection)
+ 
+    if gameState == "GameOver":
+         SURFACE.blit(gameOverText, gameOverRect)
     
     clock.tick(SPEED)
     
